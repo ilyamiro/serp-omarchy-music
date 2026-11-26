@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "ilyamiro.serpantinum-music",
+  "name": "Serpantinum music",
+  "version": "0.1.0",
+  "author": "ilyamiro",
+  "license": "AGPL-3.0-or-later",
+  "description": "The Serpantinum music popup: cover art, lyrics, visualizer and a serpantinum-audio equalizer",
+  "kinds": [
+    "bar-widget"
+  ],
+  "entryPoints": {
+    "barWidget": "BarWidget.qml"
+  },
+  "barWidget": {
+    "displayName": "Serpantinum music",
+    "description": "Now playing with the Serpantinum music popup",
+    "category": "Media",
+    "allowMultiple": false,
+    "defaultSection": "centerBegin",
+    "defaults": {
+      "sounds": true
+    },
+    "schema": [
+      {
+        "key": "sounds",
+        "type": "boolean",
+        "label": "Click sounds",
+        "defaultValue": true
+      }
+    ]
+  }
+}
