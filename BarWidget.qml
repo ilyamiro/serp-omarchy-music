@@ -26,6 +26,7 @@ BarWidget {
     popupActive: root.popupOpen
     sounds: root.setting("sounds", true)
     onCloseRequested: root.close()
+    onOpenRequested: root.open()
   }
 
   ShellIpc {

@@ -18,7 +18,7 @@ It follows your Omarchy theme and language.
 omarchy plugin add https://github.com/ilyamiro/serp-omarchy-music.git --enable
 ```
 
-Click the note in the bar, or bind a key to `omarchy-shell ilyamiro.serpantinum-music toggle`. Tab switches between the equalizer, audio and lyrics pages, and Esc closes the popup.
+Click the note in the bar, or bind a key to `omarchy-shell ilyamiro.serpantinum-music toggle`. Tab switches between the equalizer, audio and lyrics pages, and Esc closes the popup. To use your own lyrics, open the lyrics page and choose "Select a local file". It opens your system file picker and accepts `.lrc` and `.txt` files.
 
 ## serpantinum-audio
 

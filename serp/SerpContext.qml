@@ -15,6 +15,7 @@ Item {
     property int musicTab: 0
 
     signal closeRequested()
+    signal openRequested()
 
     function activate() {
         Serp.use(root);
@@ -104,6 +105,37 @@ Item {
         if (!root.sounds || !file) return;
         let vol = Math.max(0.0, Math.min(2.0, volume === undefined ? 1.0 : Number(volume)));
         Quickshell.execDetached(["pw-play", "-P", "{\"application.id\":\"serpantinum-sfx\",\"application.name\":\"serpantinum-sfx\",\"media.role\":\"event\"}", "--volume=" + vol, serpDir + "/assets/sounds/" + file]);
+    }
+
+    property string pendingLyricsPath: ""
+
+    function pickLyricsFile() {
+        if (lyricsPick.running) return;
+        root.closeRequested();
+        lyricsPick.running = true;
+    }
+
+    Process {
+        id: lyricsPick
+        command: ["python3", root.serpDir + "/scripts/pick-file.py", root.tr("music.lyrics_picker.title", "Select a lyrics file"), root.tr("music.lyrics_picker.filter", "Lyrics files"), "*.lrc", "*.txt"]
+        stdout: StdioCollector {
+            onStreamFinished: {
+                let path = this.text.trim();
+                if (path === "") return;
+                root.pendingLyricsPath = path;
+                root.openRequested();
+                lyricsLoadTimer.restart();
+            }
+        }
+    }
+
+    Timer {
+        id: lyricsLoadTimer
+        interval: 400
+        onTriggered: {
+            if (root.pendingLyricsPath !== "") lyricsService.loadLocalLyricsFile(root.pendingLyricsPath);
+            root.pendingLyricsPath = "";
+        }
     }
 
     function installAudio() {
