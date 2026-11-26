@@ -30,6 +30,22 @@ bash ~/.config/omarchy/plugins/ilyamiro.serpantinum-music/serp/scripts/install-a
 
 It downloads the latest prebuilt release from GitHub, verifies its checksum and installs it to `~/.local/bin`. No password is needed.
 
+## Remove
+
+```bash
+omarchy plugin remove ilyamiro.serpantinum-music
+```
+
+If the popup installed serpantinum-audio for you and you no longer want it:
+
+```bash
+serpantinum-audio ctl quit
+rm ~/.local/bin/serpantinum-audio
+rm -r ~/.local/share/licenses/serpantinum-audio
+```
+
+Stopping the daemon moves your apps back to your normal output. The plugin keeps its equalizer state and cover cache under `$XDG_RUNTIME_DIR/serpantinum`, which is cleared when you log out.
+
 ## Network use
 
 While the popup is open, it fetches cover art for the playing track when the player doesn't provide it. On the lyrics page it searches lrclib.net and NetEase for lyrics.
