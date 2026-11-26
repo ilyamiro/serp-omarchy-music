@@ -102,6 +102,20 @@ These notes supersede the Design section below where they differ.
 - **Art fetching** only runs while the popup is open (`MprisController.enabled`).
 - **Translations:** `i18n/<code>.json` hold the 54 `music.*`, `guide.file_picker.*` and `guide.lyrics_picker.*` keys, generated from Serpantinum's 23 matching languages (`ua` becomes `uk`, `zh_tw` becomes `zh-TW`; `es`, `pt` and `zh` serve as base-language fallbacks). New plugin-only keys exist in `en.json` only.
 - **Tab persistence:** popup content is rebuilt on every open, unlike Serpantinum's long-lived popout window. So the selected tab lives in `SerpContext.musicTab`, which `MusicBottomHeader`'s switch writes on change and reads as its initial index. `MusicPopup` seeds `actionBtnMorph`, `presetSlideProgress` and `audioHeaderProgress` from that index in `Component.onCompleted`, so the header buttons match the restored tab.
+- **Lyrics file picker:** the Serpantinum `FilePicker`, `Input` and `CloseButton` components were dropped. `LyricsPicker.qml` is a thin wrapper that keeps the popup's interface and calls `SerpContext.pickLyricsFile()`.
+  - **The flow:**
+    1. The popup closes, because the dialog would steal Hyprland's focus grab anyway.
+    2. `serp/scripts/pick-file.py` calls the XDG portal `org.freedesktop.portal.FileChooser.OpenFile` through Python GObject, which Omarchy ships. It uses the "Lyrics files" filter (`*.lrc`, `*.txt`) and a translated title, and prints the chosen path.
+    3. The context reopens the popup, and after 400 ms calls `Lyrics.loadLocalLyricsFile()`, which caches the result.
+  - **The process lives in the context,** not the popup, so it survives the popup closing.
+  - **Portal crash:** the script exits if the portal's bus name disappears, so a crashed portal can't leave a request hanging and blocking the next one.
+  - **Verified in the VM:** the GTK portal dialog opens, a chosen `.lrc` loads synced lyrics, Esc cancels cleanly, and the picker reopens.
+  - **VM testing tip:** `wtype` named keys (Return, Escape, BackSpace) don't reach GTK4 dialogs. Use `sendkey ret` and `sendkey esc` over the QEMU monitor, and type text slowly (`wtype -d 90`) so the location bar's autocomplete doesn't eat characters.
+- **Translations:**
+  - `i18n/` covers all 50 Omarchy locales with 49 keys each. `es-MX`, `zh-CN` and `pt-BR` fall back to `es`, `zh` and `pt`.
+  - The 22 languages Serpantinum already had keep its strings, plus the new install and picker strings. The other 27 were written for this plugin.
+  - Verified live in Danish and Russian with `omarchy-language`.
+  - The device pill's "Speaker" comes from `art_fetch.sh`, so it isn't translated (same upstream).
 - **Executable bits matter:** `MusicEqualizerState.execCmd` runs `equalizer.sh` directly through `bash -c`, so `serp/media/*.sh` and `serp/scripts/*.sh` must stay mode 755, as they are upstream. Copied in as 644, every equalizer command failed with exit 126, so nothing was saved and the daemon stayed flat. Keep the modes when vendoring files, and keep them in git.
 - **VM dev loop:**
   - Restart the shell after each deploy (`omarchy-restart-shell`). Hot reload keeps the last good build when a new one fails to load, which hides errors.
