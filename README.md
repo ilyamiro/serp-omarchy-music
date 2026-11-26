@@ -15,7 +15,7 @@ It follows your Omarchy theme and language.
 ## Install
 
 ```bash
-omarchy plugin add https://github.com/ilyamiro/serp-omarchy-plugin.git --enable
+omarchy plugin add https://github.com/ilyamiro/serp-omarchy-music.git --enable
 ```
 
 Click the note in the bar, or bind a key to `omarchy-shell ilyamiro.serpantinum-music toggle`. Tab switches between the equalizer, audio and lyrics pages, and Esc closes the popup.
