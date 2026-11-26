@@ -17,7 +17,7 @@
     "description": "Now playing with the Serpantinum music popup",
     "category": "Media",
     "allowMultiple": false,
-    "defaultSection": "centerBegin",
+    "defaultSection": "center",
     "defaults": {
       "sounds": true
     },
