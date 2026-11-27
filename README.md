@@ -28,7 +28,7 @@ The equalizer, the audio settings and the visualizer need `serpantinum-audio`. I
 bash ~/.config/omarchy/plugins/ilyamiro.serpantinum-music/serp/scripts/install-audio.sh
 ```
 
-It downloads the latest prebuilt release from GitHub, verifies its checksum and installs it to `~/.local/bin`. No password is needed.
+It downloads the serpantinum-audio release pinned in the plugin, verifies it against the SHA-256 digest stored in the script and installs it to `~/.local/bin`. A new serpantinum-audio version arrives only with a plugin update. No password is needed.
 
 ## Remove
 

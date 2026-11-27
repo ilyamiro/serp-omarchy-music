@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "ilyamiro.serpantinum-music",
   "name": "Serpantinum music",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "author": "ilyamiro",
   "license": "AGPL-3.0-or-later",
   "description": "The Serpantinum music popup: cover art, lyrics, visualizer and a serpantinum-audio equalizer",

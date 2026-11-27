@@ -179,17 +179,17 @@ Keep Serpantinum's own `MprisController` and `Quickshell.Services.Mpris`, since 
 `omarchy plugin add` never runs install hooks or sudo, so the daemon is installed by a script the plugin ships. AUR registrations are closed, so there's no AUR route. The script ports the prebuilt path of Serpantinum's installer (`install/modules/audio.sh`, `audio_install_prebuilt`):
 
 - `serp/scripts/install-audio.sh`:
-  - reads `https://api.github.com/repos/ilyamiro/serpantinum-audio/releases/latest`
-  - picks `serpantinum-audio-<ver>-<x86_64|aarch64>-linux.tar.gz`
-  - verifies it against the release's `SHA256SUMS`
+  - pins `VERSION` and a SHA-256 digest per architecture in the script (marketplace security review on submission #16032: never trust `releases/latest` or the release's own `SHA256SUMS`)
+  - downloads `releases/download/v<ver>/serpantinum-audio-<ver>-<x86_64|aarch64>-linux.tar.gz`
+  - verifies it against the pinned digest before extracting or running anything
   - checks that `usr/bin/serpantinum-audio version` runs
   - installs to `~/.local/bin/serpantinum-audio` (and the license to `~/.local/share/licenses/serpantinum-audio/`) without sudo, then runs `serpantinum-audio start`
 
-  It skips the install when the installed `version` already matches the release tag. v0.4.0 has assets for both architectures, built on GitHub's Ubuntu runners, so the glibc is older than Arch's.
+  It skips the install when the installed `version` already matches the pinned version. Moving to a new serpantinum-audio release means updating `VERSION` and both digests and bumping the manifest version. v0.4.0 has assets for both architectures, built on GitHub's Ubuntu runners, so the glibc is older than Arch's.
 - Omarchy puts `~/.local/bin` on PATH (`default/bash/envs:44`, `default/bash/env-bootstrap:61`). The plugin still resolves the binary as `command -v serpantinum-audio`, falling back to `~/.local/bin/serpantinum-audio`, in case the shell started with a narrower PATH. This also picks up an existing `/usr/local/bin` install from the Serpantinum installer.
 - Detection: when the binary is missing, the equalizer page shows a short "serpantinum-audio isn't installed" state with an **Install** button, and the visualizer falls back to a static bar.
 - The button opens a terminal running the script, never a hidden download. Omarchy's own plugin `add`/`clone` opens a terminal for the same reason, and its safety rules forbid silently executing downloaded content. The README documents the same script as a one-liner for people who prefer to run it themselves.
-- Updates: the equalizer page compares `serpantinum-audio version` with the latest tag only when the page is opened (one bounded API call), and offers the same terminal update.
+- Updates: serpantinum-audio updates ship only as plugin updates that change the pins.
 
 ## Test environment: Omarchy VM
 
@@ -224,7 +224,7 @@ Commands: `vm.sh install`, `vm.sh run`, `vm.sh snapshot|restore NAME` (qcow2 int
 3. **Adapter singletons:** ThemeBackend, Caching, Config, I18n, Scaler and Wallpaper. Verify: `omarchy agent look plugin` shows no QML errors. Switch the Omarchy theme and check the popup recolours live.
 4. **Popup host window:** mount `MusicPopup` from `BarWidget.qml` and match the open and close motion and click-away. Verify: it opens from the bar at top, bottom, left and right positions, and closes on outside click and Esc.
 5. **Scripts:** trim `caching.sh`, make `equalizer.sh` and `art_fetch.sh` resolve from the plugin folder and run them through `bash` explicitly. Verify: EQ presets, single bands, balance, mono, swap, dynamics and dynamic EQ all reach the daemon (`serpantinum-audio ctl get` matches the UI).
-6. **No-daemon path and installer:** on a clean VM snapshot, open the equalizer page. Verify: the popup opens, the install state shows and nothing logs errors in a loop. The **Install** button opens a terminal, the checksum is verified, `~/.local/bin/serpantinum-audio version` matches the latest tag, and the equalizer comes alive without restarting the shell. A corrupted tarball (edit `SHA256SUMS` in a test copy) must abort before installing.
+6. **No-daemon path and installer:** on a clean VM snapshot, open the equalizer page. Verify: the popup opens, the install state shows and nothing logs errors in a loop. The **Install** button opens a terminal, the checksum is verified, `~/.local/bin/serpantinum-audio version` matches the pinned version, and the equalizer comes alive without restarting the shell. A tampered digest (edit the pin in a test copy) must abort before installing.
 7. **Safety pass:** `Text.PlainText` on every metadata or lyrics sink. Add a `lyricsOnline` / `coverArtOnline` setting (default on, disclosed in the description). Bound response sizes. Verify: a track titled `<img src=https://example.invalid/x>` renders literally.
 8. **Translations:** move the 34 keys into `i18n/en.json` and the other languages. Verify: switching the Omarchy language changes the popup live.
 9. **Motion and reduced motion:** route durations through `Style.duration`. Verify: `omarchy toggle animations` disables them.
